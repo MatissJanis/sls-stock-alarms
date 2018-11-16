@@ -1,0 +1,30 @@
+service: stock-alarms
+
+custom:
+  alerts:
+    topics:
+      alarm:
+        topic: ${self:service}-alerts-alarm
+        notifications:
+          - protocol: email
+            endpoint: ${env:RECIPIENT_EMAIL}
+    alarms:
+      - functionErrors
+
+provider:
+  name: aws
+  region: eu-west-1
+  runtime: nodejs6.10
+  timeout: 1
+  versionFunctions: false
+  environment: ${file(./serverless.env.yml)}
+
+functions:
+  stock-alarms:
+    handler: src/index.run
+    timeout: 1
+    events:
+      - schedule: rate(1 day)
+
+plugins:
+  - serverless-plugin-aws-alerts

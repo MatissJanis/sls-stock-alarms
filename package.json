@@ -1,0 +1,32 @@
+{
+  "name": "sls-stock-alarms",
+  "version": "1.0.0",
+  "description": "Serverless stock email alarms when the specified thresholds are reached.",
+  "main": "src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MatissJanis/sls-stock-alarms.git"
+  },
+  "keywords": [
+    "serverless",
+    "stock",
+    "fintech",
+    "alarms",
+    "email"
+  ],
+  "author": "Matiss Janis Aboltins <matiss@mja.lv>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MatissJanis/sls-stock-alarms/issues"
+  },
+  "homepage": "https://github.com/MatissJanis/sls-stock-alarms#readme",
+  "devDependencies": {
+    "serverless": "^1.33.1",
+    "serverless-plugin-aws-alerts": "^1.2.4"
+  },
+  "dependencies": {
+    "mailgun-js": "^0.22.0",
+    "moment": "^2.22.2",
+    "yahoo-finance": "^0.3.5"
+  }
+}
