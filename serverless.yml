@@ -3,7 +3,7 @@ service: stock-alarms
 provider:
   name: aws
   region: eu-west-1
-  runtime: nodejs6.10
+  runtime: nodejs8.10
   timeout: 1
   versionFunctions: false
   environment: ${file(./serverless.env.yml)}

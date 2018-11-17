@@ -28,38 +28,64 @@ const sendEmail = (text, callback) => {
 }
 
 module.exports.run = (event, context, callback) => {
-  const symbols = config.map((row) => row.symbol);
+  new Promise((resolve, reject) => {
+    yahooFinance.historical({
+      symbols: config.map((row) => row.symbol),
+      from: moment().subtract(1, 'month').format('YYYY-MM-DD'),
+      to: moment().format('YYYY-MM-DD'),
+    }, (err, response) => {
+      if (err) {
+        return reject(err);
+      }
 
-  yahooFinance.historical({
-    symbols,
-    from: moment().subtract(1, 'month').format('YYYY-MM-DD'),
-    to: moment().format('YYYY-MM-DD'),
-  }, (err, body) => {
-    if (err) {
-      return callback(err);
-    }
+      resolve(response);
+    });
 
-    symbols.forEach((symbol) => {
-      const quotes = body[symbol];
+  })
+  .then((response) =>
+    config.map((row) => {
+      const quotes = response[row.symbol];
       const open = quotes[0].open;
       const close = quotes[quotes.length - 1].close;
 
-      const threshold = parseFloat(config.find((row) => row.symbol === symbol).threshold);
       const difference = close / open - 1;
       const percent = (difference * 100).toFixed(2);
 
-      if (difference <= threshold) {
-        // @todo: move this to a promise hain
-        return sendEmail(emailText(symbol, percent), (err) => {
-          if (err) {
-            return callback(err);
-          }
+      return {
+        symbol: row.symbol,
+        percent,
+        difference,
+        threshold: row.threshold,
+      };
+    })
+    .filter((row) => row.difference <= row.threshold),
+  )
+  .then((symbols) => symbols.length ? new Promise((resolve, reject) => {
+    let done = 0;
 
-          callback(null, `Sucessfully sent out email notification for ${percent}% difference.`);
-        });
-      }
+    symbols.forEach((row) => {
+      sendEmail(emailText(row.symbol, row.percent), (err) => {
+        if (err) {
+          return reject(err);
+        }
 
-      callback(null, `Email does not need to be sent for ${percent}% difference.`);
+        done += 1;
+
+        if (done >= symbols.length) {
+          resolve(symbols);
+        }
+      })
     });
+  }) : [])
+  .then((symbols) => {
+    if (symbols.length === 0) {
+      callback(null, 'No symbols reached the threshold. No emails have been sent.');
+      return;
+    }
+
+    callback(null, `Sucessfully sent out email notification/s for ${symbols.join(', ')} symbols.`);
+  })
+  .catch((err) => {
+    callback(err);
   });
 }
