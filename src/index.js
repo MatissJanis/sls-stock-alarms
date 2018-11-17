@@ -1,6 +1,7 @@
 const moment = require('moment');
 const yahooFinance = require('yahoo-finance');
 const Mailgun = require('mailgun-js');
+const config = require('./config.json');
 
 const emailText = (symbol, percent) => `
   Stock alarm has been triggered for ${percent}% difference in the price, in the last month.
@@ -27,33 +28,38 @@ const sendEmail = (text, callback) => {
 }
 
 module.exports.run = (event, context, callback) => {
-  const symbol = process.env.STOCK_SYMBOL;
+  const symbols = config.map((row) => row.symbol);
 
   yahooFinance.historical({
-    symbol,
+    symbols,
     from: moment().subtract(1, 'month').format('YYYY-MM-DD'),
     to: moment().format('YYYY-MM-DD'),
-  }, function (err, quotes) {
+  }, (err, body) => {
     if (err) {
       return callback(err);
     }
 
-    const open = quotes[0].open;
-    const close = quotes[quotes.length - 1].close;
+    symbols.forEach((symbol) => {
+      const quotes = body[symbol];
+      const open = quotes[0].open;
+      const close = quotes[quotes.length - 1].close;
 
-    const difference = close / open - 1;
-    const percent = (difference * 100).toFixed(2);
+      const threshold = parseFloat(config.find((row) => row.symbol === symbol).threshold);
+      const difference = close / open - 1;
+      const percent = (difference * 100).toFixed(2);
 
-    if (difference <= process.env.ALARM_THRESHOLD) {
-      return sendEmail(emailText(symbol, percent), (err) => {
-        if (err) {
-          return callback(err);
-        }
+      if (difference <= threshold) {
+        // @todo: move this to a promise hain
+        return sendEmail(emailText(symbol, percent), (err) => {
+          if (err) {
+            return callback(err);
+          }
 
-        callback(null, `Sucessfully sent out email notification for ${percent}% difference.`);
-      });
-    }
+          callback(null, `Sucessfully sent out email notification for ${percent}% difference.`);
+        });
+      }
 
-    callback(null, `Email does not need to be sent for ${percent}% difference.`);
+      callback(null, `Email does not need to be sent for ${percent}% difference.`);
+    });
   });
 }
