@@ -2,5 +2,9 @@
   {
     "symbol": "IWDA.AS",
     "threshold": "-0.1"
+  },
+  {
+    "symbol": "IEMA.AS",
+    "threshold": "-0.1"
   }
 ]
