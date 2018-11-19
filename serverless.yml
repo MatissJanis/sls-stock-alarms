@@ -6,7 +6,11 @@ provider:
   runtime: nodejs8.10
   timeout: 5
   versionFunctions: false
-  environment: ${file(./serverless.env.yml)}
+  environment:
+    SENDER_EMAIL: ${file(serverless.env.yml):SENDER_EMAIL, env:SENDER_EMAIL}
+    RECIPIENT_EMAIL: ${file(serverless.env.yml):RECIPIENT_EMAIL, env:RECIPIENT_EMAIL}
+    MAILGUN_KEY: ${file(serverless.env.yml):MAILGUN_KEY, env:MAILGUN_KEY}
+    MAILGUN_DOMAIN: ${file(serverless.env.yml):MAILGUN_DOMAIN, env:MAILGUN_DOMAIN}
 
 custom:
   alerts:
