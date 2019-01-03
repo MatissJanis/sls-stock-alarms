@@ -58,7 +58,7 @@ module.exports.run = (event, context, callback) => {
         threshold: row.threshold,
       };
     })
-    .filter((row) => row.difference <= row.threshold),
+    .filter((row) => row.difference > -100 && row.difference <= row.threshold),
   )
   .then((symbols) => symbols.length ? new Promise((resolve, reject) => {
     let done = 0;
