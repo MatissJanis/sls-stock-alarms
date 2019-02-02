@@ -45,8 +45,8 @@ module.exports.run = (event, context, callback) => {
   .then((response) =>
     config.map((row) => {
       const quotes = response[row.symbol];
-      const open = quotes[0].open;
-      const close = quotes[quotes.length - 1].close;
+      const open = quotes[quotes.length - 1].open;
+      const close = quotes[0].close;
 
       const difference = close / open - 1;
       const percent = (difference * 100).toFixed(2);
