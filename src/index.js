@@ -17,6 +17,7 @@ const sendEmail = (text, callback) => {
   const mailgun = new Mailgun({
     apiKey: process.env.MAILGUN_KEY,
     domain: process.env.MAILGUN_DOMAIN,
+    timeout: 3000,
   });
 
   mailgun.messages().send({
