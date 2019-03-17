@@ -44,7 +44,7 @@ module.exports.run = (event, context, callback) => {
 
   })
   .then((response) =>
-    config.map((row) => {
+    config.filter((row) => response[row.symbol].length > 0).map((row) => {
       const quotes = response[row.symbol];
       const open = quotes[quotes.length - 1].open;
       const close = quotes[0].close;
