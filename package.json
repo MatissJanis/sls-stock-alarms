@@ -21,12 +21,12 @@
   },
   "homepage": "https://github.com/MatissJanis/sls-stock-alarms#readme",
   "devDependencies": {
-    "serverless": "^1.67.3",
-    "serverless-plugin-aws-alerts": "^1.4.0"
+    "serverless": "^1.77.1",
+    "serverless-plugin-aws-alerts": "^1.6.1"
   },
   "dependencies": {
     "mailgun-js": "^0.22.0",
-    "moment": "^2.24.0",
+    "moment": "^2.27.0",
     "yahoo-finance": "^0.3.6"
   },
   "scripts": {
